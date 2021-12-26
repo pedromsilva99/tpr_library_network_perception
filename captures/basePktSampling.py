@@ -109,7 +109,7 @@ def main():
                 timestamp,srcIP,dstIP,lengthIP=pkt.sniff_timestamp,pkt.ip.src,pkt.ip.dst,pkt.ip.len
                 pktHandler(timestamp,srcIP,dstIP,lengthIP,sampDelta)
             except:
-                pass
+                pass#print("fogo")
             
     
 
