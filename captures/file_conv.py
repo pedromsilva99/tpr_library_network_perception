@@ -1,6 +1,6 @@
 import argparse
 import numpy as np
-def main():
+def convDataToFile(input, output):
     parser=argparse.ArgumentParser()
     parser.add_argument('-i', '--input', nargs='?',required=True, help='input file')
     parser.add_argument('-o', '--output', nargs='?',required=True, help='output file')
