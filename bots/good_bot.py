@@ -7,6 +7,6 @@ while(1):
     website = random.randrange(10)
     sitedata=requests.get(ls[website])
     print(ls[website])
-    numb = random.randrange(20)
+    numb = random.randrange(120)
     print("Adormece " + str(numb) + " segundos")
     time.sleep(numb)
