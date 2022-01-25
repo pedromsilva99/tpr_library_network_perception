@@ -144,11 +144,11 @@ def extractFeaturesWavelet(data,scales=[2,4,8,16,32],Class=0):
 Classes={0:'YouTube',1:'Browsing',2:'Bot', 3:'P2P', 4: 'VideoCall'}
 
 ## -- extract data from files -- ##
-yt=np.loadtxt('2pyoutube.txt')
-browsing=np.loadtxt('2pbrowsing.txt')
-bot=np.loadtxt('2psimplebot.txt')
-p2p=np.loadtxt('2pmediumbot.txt')
-vc=np.loadtxt('2pgoodbot.txt')
+yt=np.loadtxt('2p1hyoutube.txt')
+browsing=np.loadtxt('2p1hbrowsing.txt')
+bot=np.loadtxt('2p1hsimplebot.txt')
+p2p=np.loadtxt('2p1hp2p.txt')
+vc=np.loadtxt('2p1hclass.txt')
 
 ## -- show plots of each data type -- ##
 plt.figure(1)
@@ -164,31 +164,31 @@ vc_train,vc_test=breakTrainTest(vc)
 
 plt.figure(2)
 plt.subplot(5,1,1)
-for i in range(10):
+for i in range(7):
     plt.plot(yt_train[i,:,0],'b')
     plt.plot(yt_train[i,:,1],'g')
 plt.title('YouTube')
 plt.ylabel('Bytes/sec')
 plt.subplot(5,1,2)
-for i in range(10):
+for i in range(7):
     plt.plot(browsing_train[i,:,0],'b')
     plt.plot(browsing_train[i,:,1],'g')
 plt.title('Browsing')
 plt.ylabel('Bytes/sec')
 plt.subplot(5,1,3)
-for i in range(10):
+for i in range(7):
     plt.plot(bot_train[i,:,0],'b')
     plt.plot(bot_train[i,:,1],'g')
 plt.title('Bot')
 plt.ylabel('Bytes/sec')
 plt.subplot(5,1,4)
-for i in range(10):
+for i in range(7):
     plt.plot(p2p_train[i,:,0],'b')
     plt.plot(p2p_train[i,:,1],'g')
 plt.title('P2P')
 plt.ylabel('Bytes/sec')
 plt.subplot(5,1,5)
-for i in range(10):
+for i in range(7):
     plt.plot(vc_train[i,:,0],'b')
     plt.plot(vc_train[i,:,1],'g')
 plt.title('VideoCall')
