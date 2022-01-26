@@ -69,7 +69,7 @@ def extractFeatures(data,Class=0):
     oClass=np.ones((nObs,1))*Class
     for i in range(nObs):
         M1=np.mean(data[i,:,:],axis=0)
-        #Md1=np.median(data[i,:,:],axis=0)
+        Md1=np.median(data[i,:,:],axis=0)
         Std1=np.std(data[i,:,:],axis=0)
         #S1=stats.skew(data[i,:,:])
         #K1=stats.kurtosis(data[i,:,:])
@@ -152,7 +152,7 @@ vc=np.loadtxt('2p1hclass.txt')
 
 ## -- show plots of each data type -- ##
 plt.figure(1)
-plotClasses(yt,'YouTube',browsing,'Browsing',bot,'Mining',p2p,'P2P',vc,'VideoCall')
+plotClasses(yt,'YouTube',browsing,'Browsing',bot,'Bot',p2p,'P2P',vc,'VideoCall')
 
 ## -- save training and test part of each sample and show graphics of training part: 0(b)-download 1(g)-upload -- ##
 yt_train,yt_test=breakTrainTest(yt)
@@ -219,51 +219,54 @@ oClass=np.vstack((oClass_yt,oClass_browsing,oClass_bot,oClass_p2p,oClass_vc))
 scales=[2,4,8,16,32,64,128,256]
 
 ## -- sets of features: -- ##
-#:1 ->  training set for anomaly detection (only youtube and browsing - mining is the anomaly)
+#:1 ->  training set for anomaly detection (only youtube, browsing, p2p and videocall- bot is the anomaly)
 trainFeatures_yt,oClass_yt=extractFeatures(yt_train,Class=0)
 trainFeatures_browsing,oClass_browsing=extractFeatures(browsing_train,Class=1)
+trainFeatures_p2p,oClass_p2p=extractFeatures(p2p_train,Class=3)
 trainFeatures_vc,oClass_vc=extractFeatures(vc_train,Class=4)
-trainFeatures=np.vstack((trainFeatures_yt,trainFeatures_browsing,trainFeatures_vc))
+trainFeatures=np.vstack((trainFeatures_yt,trainFeatures_browsing,trainFeatures_p2p,trainFeatures_vc))
 
 trainFeatures_ytS,oClass_yt=extractFeaturesSilence(yt_train,Class=0)
 trainFeatures_browsingS,oClass_browsing=extractFeaturesSilence(browsing_train,Class=1)
+trainFeatures_p2pS,oClass_p2p=extractFeaturesSilence(p2p_train,Class=3)
 trainFeatures_vcS,oClass_vc=extractFeaturesSilence(vc_train,Class=4)
-trainFeaturesS=np.vstack((trainFeatures_ytS,trainFeatures_browsingS,trainFeatures_vcS))
+trainFeaturesS=np.vstack((trainFeatures_ytS,trainFeatures_browsingS,trainFeatures_p2pS,trainFeatures_vcS))
 
 trainFeatures_ytW,oClass_yt=extractFeaturesWavelet(yt_train,scales,Class=0)
 trainFeatures_browsingW,oClass_browsing=extractFeaturesWavelet(browsing_train,scales,Class=1)
+trainFeatures_p2pW,oClass_p2p=extractFeaturesWavelet(p2p_train,scales,Class=3)
 trainFeatures_vcW,oClass_vc=extractFeaturesWavelet(vc_train,scales,Class=4)
-trainFeaturesW=np.vstack((trainFeatures_ytW,trainFeatures_browsingW,trainFeatures_vcW))
+trainFeaturesW=np.vstack((trainFeatures_ytW,trainFeatures_browsingW,trainFeatures_p2pW,trainFeatures_vcW))
 
-o2trainClass=np.vstack((oClass_yt,oClass_browsing,oClass_vc))
+o2trainClass=np.vstack((oClass_yt,oClass_browsing,oClass_p2p,oClass_vc))
 i2trainFeatures=np.hstack((trainFeatures,trainFeaturesS,trainFeaturesW))
 
 #:2 -> training set for traffic classification
 trainFeatures_yt,oClass_yt=extractFeatures(yt_train,Class=0)
 trainFeatures_browsing,oClass_browsing=extractFeatures(browsing_train,Class=1)
-trainFeatures_bot,oClass_bot=extractFeatures(bot_train,Class=2)
+#trainFeatures_bot,oClass_bot=extractFeatures(bot_train,Class=2)
 trainFeatures_p2p,oClass_p2p=extractFeatures(p2p_train,Class=3)
 trainFeatures_vc,oClass_vc=extractFeatures(vc_train,Class=4)
-trainFeatures=np.vstack((trainFeatures_yt,trainFeatures_browsing,trainFeatures_bot,trainFeatures_p2p,trainFeatures_vc))
+trainFeatures=np.vstack((trainFeatures_yt,trainFeatures_browsing,trainFeatures_p2p,trainFeatures_vc))
 
 trainFeatures_ytS,oClass_yt=extractFeaturesSilence(yt_train,Class=0)
 trainFeatures_browsingS,oClass_browsing=extractFeaturesSilence(browsing_train,Class=1)
-trainFeatures_botS,oClass_bot=extractFeaturesSilence(bot_train,Class=2)
+#trainFeatures_botS,oClass_bot=extractFeaturesSilence(bot_train,Class=2)
 trainFeatures_p2pS,oClass_p2p=extractFeaturesSilence(p2p_train,Class=3)
 trainFeatures_vcS,oClass_vc=extractFeaturesSilence(vc_train,Class=4)
-trainFeaturesS=np.vstack((trainFeatures_ytS,trainFeatures_browsingS,trainFeatures_botS,trainFeatures_p2pS,trainFeatures_vcS))
+trainFeaturesS=np.vstack((trainFeatures_ytS,trainFeatures_browsingS,trainFeatures_p2pS,trainFeatures_vcS))
 
 trainFeatures_ytW,oClass_yt=extractFeaturesWavelet(yt_train,scales,Class=0)
 trainFeatures_browsingW,oClass_browsing=extractFeaturesWavelet(browsing_train,scales,Class=1)
-trainFeatures_botW,oClass_bot=extractFeaturesWavelet(bot_train,scales,Class=2)
+#trainFeatures_botW,oClass_bot=extractFeaturesWavelet(bot_train,scales,Class=2)
 trainFeatures_p2pW,oClass_p2p=extractFeaturesWavelet(p2p_train,scales,Class=3)
 trainFeatures_vcW,oClass_vc=extractFeaturesWavelet(vc_train,scales,Class=4)
-trainFeaturesW=np.vstack((trainFeatures_ytW,trainFeatures_browsingW,trainFeatures_botW,trainFeatures_p2pW,trainFeatures_vcW))
+trainFeaturesW=np.vstack((trainFeatures_ytW,trainFeatures_browsingW,trainFeatures_p2pW,trainFeatures_vcW))
 
-o3trainClass=np.vstack((oClass_yt,oClass_browsing,oClass_bot,oClass_p2p,oClass_vc))
+o3trainClass=np.vstack((oClass_yt,oClass_browsing,oClass_p2p,oClass_vc))
 i3trainFeatures=np.hstack((trainFeatures,trainFeaturesS,trainFeaturesW))
 
-#:3 -> training set for anomaly and classification 
+#:3 -> test set for anomaly 
 testFeatures_yt,oClass_yt=extractFeatures(yt_test,Class=0)
 testFeatures_browsing,oClass_browsing=extractFeatures(browsing_test,Class=1)
 testFeatures_bot,oClass_bot=extractFeatures(bot_test,Class=2)
@@ -287,6 +290,9 @@ testFeaturesW=np.vstack((testFeatures_ytW,testFeatures_browsingW,testFeatures_bo
 
 o3testClass=np.vstack((oClass_yt,oClass_browsing,oClass_bot,oClass_p2p,oClass_vc))
 i3testFeatures=np.hstack((testFeatures,testFeaturesS,testFeaturesW))
+
+#:4 -> test set for classification
+o3testClassClassification=np.vstack((oClass_yt,oClass_browsing,oClass_p2p,oClass_vc))
 
 ## -- features normalization (acertar a escala) -- ##
 i2trainScaler = MaxAbsScaler().fit(i2trainFeatures)
@@ -372,8 +378,8 @@ L3=poly_svc.predict(i3CtestFeaturesN)
 print('\n')
 
 nObsTest,nFea=i3CtestFeaturesN.shape
-for i in range(nObsTest):
-    print('Obs: {:2} ({:<8}): Kernel Linear->{:<10} | Kernel RBF->{:<10} | Kernel Poly->{:<10}'.format(i,Classes[o3testClass[i][0]],Classes[L1[i]],Classes[L2[i]],Classes[L3[i]]))
+for i in range(nObsTest-7):
+    print('Obs: {:2} ({:<8}): Kernel Linear->{:<10} | Kernel RBF->{:<10} | Kernel Poly->{:<10}'.format(i,Classes[o3testClassClassification[i][0]],Classes[L1[i]],Classes[L2[i]],Classes[L3[i]]))
 
 
 ## -- 19 -- #
@@ -388,8 +394,8 @@ L3=poly_svc.predict(i3CtestFeaturesNPCA)
 print('\n')
 
 nObsTest,nFea=i3CtestFeaturesNPCA.shape
-for i in range(nObsTest):
-    print('Obs: {:2} ({:<8}): Kernel Linear->{:<10} | Kernel RBF->{:<10} | Kernel Poly->{:<10}'.format(i,Classes[o3testClass[i][0]],Classes[L1[i]],Classes[L2[i]],Classes[L3[i]]))
+for i in range(nObsTest-7):
+    print('Obs: {:2} ({:<8}): Kernel Linear->{:<10} | Kernel RBF->{:<10} | Kernel Poly->{:<10}'.format(i,Classes[o3testClassClassification[i][0]],Classes[L1[i]],Classes[L2[i]],Classes[L3[i]]))
 
 
 ## -- 20a -- ##
@@ -403,8 +409,8 @@ clf.fit(i3trainFeaturesN, o3trainClass)
 LT=clf.predict(i3CtestFeaturesN) 
 
 nObsTest,nFea=i3CtestFeaturesN.shape
-for i in range(nObsTest):
-    print('Obs: {:2} ({:<8}): Classification->{}'.format(i,Classes[o3testClass[i][0]],Classes[LT[i]]))
+for i in range(nObsTest-7):
+    print('Obs: {:2} ({:<8}): Classification->{}'.format(i,Classes[o3testClassClassification[i][0]],Classes[LT[i]]))
 
 ## -- 20b -- ##
 from sklearn.neural_network import MLPClassifier
@@ -417,5 +423,5 @@ clf.fit(i3trainFeaturesNPCA, o3trainClass)
 LT=clf.predict(i3CtestFeaturesNPCA) 
 
 nObsTest,nFea=i3CtestFeaturesNPCA.shape
-for i in range(nObsTest):
-    print('Obs: {:2} ({:<8}): Classification->{}'.format(i,Classes[o3testClass[i][0]],Classes[LT[i]]))    
+for i in range(nObsTest-7):
+    print('Obs: {:2} ({:<8}): Classification->{}'.format(i,Classes[o3testClassClassification[i][0]],Classes[LT[i]]))    
