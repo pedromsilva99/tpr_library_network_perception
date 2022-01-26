@@ -69,7 +69,7 @@ def extractFeatures(data,Class=0):
     oClass=np.ones((nObs,1))*Class
     for i in range(nObs):
         M1=np.mean(data[i,:,:],axis=0)
-        Md1=np.median(data[i,:,:],axis=0)
+        #Md1=np.median(data[i,:,:],axis=0)
         Std1=np.std(data[i,:,:],axis=0)
         #S1=stats.skew(data[i,:,:])
         #K1=stats.kurtosis(data[i,:,:])
@@ -141,26 +141,25 @@ def extractFeaturesWavelet(data,scales=[2,4,8,16,32],Class=0):
         
     return(np.array(features),oClass)
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Classes={0:'YouTube',1:'Browsing',2:'Bot', 3:'P2P', 4: 'VideoCall'}
+Classes={0:'YouTube',1:'Browsing',2:'P2P', 3:'VideoCall', 4: 'Bot'}
 
 ## -- extract data from files -- ##
 yt=np.loadtxt('2p1hyoutube.txt')
 browsing=np.loadtxt('2p1hbrowsing.txt')
-bot=np.loadtxt('2p1hsimplebot.txt')
 p2p=np.loadtxt('2p1hp2p.txt')
 vc=np.loadtxt('2p1hclass.txt')
+bot=np.loadtxt('2p1hsimplebot.txt')
 
 ## -- show plots of each data type -- ##
 plt.figure(1)
-plotClasses(yt,'YouTube',browsing,'Browsing',bot,'Bot',p2p,'P2P',vc,'VideoCall')
+plotClasses(yt,'YouTube',browsing,'Browsing',p2p,'P2P',vc,'VideoCall',bot,'Bot')
 
 ## -- save training and test part of each sample and show graphics of training part: 0(b)-download 1(g)-upload -- ##
 yt_train,yt_test=breakTrainTest(yt)
 browsing_train,browsing_test=breakTrainTest(browsing)
-bot_train,bot_test=breakTrainTest(bot)
 p2p_train,p2p_test=breakTrainTest(p2p)
 vc_train,vc_test=breakTrainTest(vc)
-
+bot_train,bot_test=breakTrainTest(bot)
 
 plt.figure(2)
 plt.subplot(5,1,1)
@@ -177,9 +176,9 @@ plt.title('Browsing')
 plt.ylabel('Bytes/sec')
 plt.subplot(5,1,3)
 for i in range(7):
-    plt.plot(bot_train[i,:,0],'b')
-    plt.plot(bot_train[i,:,1],'g')
-plt.title('Bot')
+    plt.plot(vc_train[i,:,0],'b')
+    plt.plot(vc_train[i,:,1],'g')
+plt.title('VC')
 plt.ylabel('Bytes/sec')
 plt.subplot(5,1,4)
 for i in range(7):
@@ -189,31 +188,31 @@ plt.title('P2P')
 plt.ylabel('Bytes/sec')
 plt.subplot(5,1,5)
 for i in range(7):
-    plt.plot(vc_train[i,:,0],'b')
-    plt.plot(vc_train[i,:,1],'g')
-plt.title('VideoCall')
+    plt.plot(bot_train[i,:,0],'b')
+    plt.plot(bot_train[i,:,1],'g')
+plt.title('Bot')
 plt.ylabel('Bytes/sec')
 plt.show()
 
 ## -- put corresponding features on each type of data -- ##
 features_yt,oClass_yt=extractFeatures(yt_train,Class=0)
 features_browsing,oClass_browsing=extractFeatures(browsing_train,Class=1)
-features_bot,oClass_bot=extractFeatures(bot_train,Class=2)
-features_p2p,oClass_p2p=extractFeatures(p2p_train,Class=3)
-features_vc,oClass_vc=extractFeatures(vc_train,Class=4)
+features_p2p,oClass_p2p=extractFeatures(p2p_train,Class=2)
+features_vc,oClass_vc=extractFeatures(vc_train,Class=3)
+features_bot,oClass_bot=extractFeatures(bot_train,Class=4)
 
-features=np.vstack((features_yt,features_browsing,features_bot,features_p2p,features_vc))
-oClass=np.vstack((oClass_yt,oClass_browsing,oClass_bot,oClass_p2p,oClass_vc))
+features=np.vstack((features_yt,features_browsing,features_p2p,features_vc,features_bot))
+oClass=np.vstack((oClass_yt,oClass_browsing,oClass_p2p,oClass_vc,oClass_bot))
 
 ## -- same as before but only for periods of silence -- ##
 features_ytS,oClass_yt=extractFeaturesSilence(yt_train,Class=0)
 features_browsingS,oClass_browsing=extractFeaturesSilence(browsing_train,Class=1)
-features_botS,oClass_bot=extractFeaturesSilence(bot_train,Class=2)
-features_p2pS,oClass_p2p=extractFeaturesSilence(p2p_train,Class=3)
-features_vcS,oClass_vc=extractFeaturesSilence(vc_train,Class=4)
+features_p2pS,oClass_p2p=extractFeaturesSilence(p2p_train,Class=2)
+features_vcS,oClass_vc=extractFeaturesSilence(vc_train,Class=3)
+features_botS,oClass_bot=extractFeaturesSilence(bot_train,Class=4)
 
-featuresS=np.vstack((features_ytS,features_browsingS,features_botS,features_p2pS,features_vcS))
-oClass=np.vstack((oClass_yt,oClass_browsing,oClass_bot,oClass_p2p,oClass_vc))
+featuresS=np.vstack((features_ytS,features_browsingS,features_p2pS,features_vcS,features_botS))
+oClass=np.vstack((oClass_yt,oClass_browsing,oClass_p2p,oClass_vc,oClass_bot))
 
 ## -- scales -- ##
 scales=[2,4,8,16,32,64,128,256]
@@ -222,14 +221,14 @@ scales=[2,4,8,16,32,64,128,256]
 #:1 ->  training set for anomaly detection (only youtube, browsing, p2p and videocall- bot is the anomaly)
 trainFeatures_yt,oClass_yt=extractFeatures(yt_train,Class=0)
 trainFeatures_browsing,oClass_browsing=extractFeatures(browsing_train,Class=1)
-trainFeatures_p2p,oClass_p2p=extractFeatures(p2p_train,Class=3)
-trainFeatures_vc,oClass_vc=extractFeatures(vc_train,Class=4)
+trainFeatures_p2p,oClass_p2p=extractFeatures(p2p_train,Class=2)
+trainFeatures_vc,oClass_vc=extractFeatures(vc_train,Class=3)
 trainFeatures=np.vstack((trainFeatures_yt,trainFeatures_browsing,trainFeatures_p2p,trainFeatures_vc))
 
 trainFeatures_ytS,oClass_yt=extractFeaturesSilence(yt_train,Class=0)
 trainFeatures_browsingS,oClass_browsing=extractFeaturesSilence(browsing_train,Class=1)
-trainFeatures_p2pS,oClass_p2p=extractFeaturesSilence(p2p_train,Class=3)
-trainFeatures_vcS,oClass_vc=extractFeaturesSilence(vc_train,Class=4)
+trainFeatures_p2pS,oClass_p2p=extractFeaturesSilence(p2p_train,Class=2)
+trainFeatures_vcS,oClass_vc=extractFeaturesSilence(vc_train,Class=3)
 trainFeaturesS=np.vstack((trainFeatures_ytS,trainFeatures_browsingS,trainFeatures_p2pS,trainFeatures_vcS))
 
 trainFeatures_ytW,oClass_yt=extractFeaturesWavelet(yt_train,scales,Class=0)
@@ -245,22 +244,22 @@ i2trainFeatures=np.hstack((trainFeatures,trainFeaturesS,trainFeaturesW))
 trainFeatures_yt,oClass_yt=extractFeatures(yt_train,Class=0)
 trainFeatures_browsing,oClass_browsing=extractFeatures(browsing_train,Class=1)
 #trainFeatures_bot,oClass_bot=extractFeatures(bot_train,Class=2)
-trainFeatures_p2p,oClass_p2p=extractFeatures(p2p_train,Class=3)
-trainFeatures_vc,oClass_vc=extractFeatures(vc_train,Class=4)
+trainFeatures_p2p,oClass_p2p=extractFeatures(p2p_train,Class=2)
+trainFeatures_vc,oClass_vc=extractFeatures(vc_train,Class=3)
 trainFeatures=np.vstack((trainFeatures_yt,trainFeatures_browsing,trainFeatures_p2p,trainFeatures_vc))
 
 trainFeatures_ytS,oClass_yt=extractFeaturesSilence(yt_train,Class=0)
 trainFeatures_browsingS,oClass_browsing=extractFeaturesSilence(browsing_train,Class=1)
 #trainFeatures_botS,oClass_bot=extractFeaturesSilence(bot_train,Class=2)
-trainFeatures_p2pS,oClass_p2p=extractFeaturesSilence(p2p_train,Class=3)
-trainFeatures_vcS,oClass_vc=extractFeaturesSilence(vc_train,Class=4)
+trainFeatures_p2pS,oClass_p2p=extractFeaturesSilence(p2p_train,Class=2)
+trainFeatures_vcS,oClass_vc=extractFeaturesSilence(vc_train,Class=3)
 trainFeaturesS=np.vstack((trainFeatures_ytS,trainFeatures_browsingS,trainFeatures_p2pS,trainFeatures_vcS))
 
 trainFeatures_ytW,oClass_yt=extractFeaturesWavelet(yt_train,scales,Class=0)
 trainFeatures_browsingW,oClass_browsing=extractFeaturesWavelet(browsing_train,scales,Class=1)
 #trainFeatures_botW,oClass_bot=extractFeaturesWavelet(bot_train,scales,Class=2)
-trainFeatures_p2pW,oClass_p2p=extractFeaturesWavelet(p2p_train,scales,Class=3)
-trainFeatures_vcW,oClass_vc=extractFeaturesWavelet(vc_train,scales,Class=4)
+trainFeatures_p2pW,oClass_p2p=extractFeaturesWavelet(p2p_train,scales,Class=2)
+trainFeatures_vcW,oClass_vc=extractFeaturesWavelet(vc_train,scales,Class=3)
 trainFeaturesW=np.vstack((trainFeatures_ytW,trainFeatures_browsingW,trainFeatures_p2pW,trainFeatures_vcW))
 
 o3trainClass=np.vstack((oClass_yt,oClass_browsing,oClass_p2p,oClass_vc))
@@ -269,26 +268,26 @@ i3trainFeatures=np.hstack((trainFeatures,trainFeaturesS,trainFeaturesW))
 #:3 -> test set for anomaly 
 testFeatures_yt,oClass_yt=extractFeatures(yt_test,Class=0)
 testFeatures_browsing,oClass_browsing=extractFeatures(browsing_test,Class=1)
-testFeatures_bot,oClass_bot=extractFeatures(bot_test,Class=2)
-testFeatures_p2p,oClass_p2p=extractFeatures(p2p_test,Class=3)
-testFeatures_vc,oClass_vc=extractFeatures(vc_test,Class=4)
-testFeatures=np.vstack((testFeatures_yt,testFeatures_browsing,testFeatures_bot,testFeatures_p2p,testFeatures_vc))
+testFeatures_p2p,oClass_p2p=extractFeatures(p2p_test,Class=2)
+testFeatures_vc,oClass_vc=extractFeatures(vc_test,Class=3)
+testFeatures_bot,oClass_bot=extractFeatures(bot_test,Class=4)
+testFeatures=np.vstack((testFeatures_yt,testFeatures_browsing,testFeatures_p2p,testFeatures_vc,testFeatures_bot))
 
 testFeatures_ytS,oClass_yt=extractFeaturesSilence(yt_test,Class=0)
 testFeatures_browsingS,oClass_browsing=extractFeaturesSilence(browsing_test,Class=1)
-testFeatures_botS,oClass_bot=extractFeaturesSilence(bot_test,Class=2)
-testFeatures_p2pS,oClass_p2p=extractFeaturesSilence(p2p_test,Class=3)
-testFeatures_vcS,oClass_vc=extractFeaturesSilence(vc_test,Class=4)
-testFeaturesS=np.vstack((testFeatures_ytS,testFeatures_browsingS,testFeatures_botS,testFeatures_p2pS,testFeatures_vcS))
+testFeatures_p2pS,oClass_p2p=extractFeaturesSilence(p2p_test,Class=2)
+testFeatures_vcS,oClass_vc=extractFeaturesSilence(vc_test,Class=3)
+testFeatures_botS,oClass_bot=extractFeaturesSilence(bot_test,Class=4)
+testFeaturesS=np.vstack((testFeatures_ytS,testFeatures_browsingS,testFeatures_p2pS,testFeatures_vcS,testFeatures_botS))
 
 testFeatures_ytW,oClass_yt=extractFeaturesWavelet(yt_test,scales,Class=0)
 testFeatures_browsingW,oClass_browsing=extractFeaturesWavelet(browsing_test,scales,Class=1)
-testFeatures_botW,oClass_bot=extractFeaturesWavelet(bot_test,scales,Class=2)
-testFeatures_p2pW,oClass_p2p=extractFeaturesWavelet(p2p_test,scales,Class=3)
-testFeatures_vcW,oClass_vc=extractFeaturesWavelet(vc_test,scales,Class=4)
-testFeaturesW=np.vstack((testFeatures_ytW,testFeatures_browsingW,testFeatures_botW,testFeatures_p2pW,testFeatures_vcW))
+testFeatures_p2pW,oClass_p2p=extractFeaturesWavelet(p2p_test,scales,Class=2)
+testFeatures_vcW,oClass_vc=extractFeaturesWavelet(vc_test,scales,Class=3)
+testFeatures_botW,oClass_bot=extractFeaturesWavelet(bot_test,scales,Class=4)
+testFeaturesW=np.vstack((testFeatures_ytW,testFeatures_browsingW,testFeatures_p2pW,testFeatures_vcW,testFeatures_botW))
 
-o3testClass=np.vstack((oClass_yt,oClass_browsing,oClass_bot,oClass_p2p,oClass_vc))
+o3testClass=np.vstack((oClass_yt,oClass_browsing,oClass_p2p,oClass_vc,oClass_bot))
 i3testFeatures=np.hstack((testFeatures,testFeaturesS,testFeaturesW))
 
 #:4 -> test set for classification
