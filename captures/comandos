@@ -3,3 +3,30 @@ vpn ua -> python3 basePktSampling.py -i tcp_simplebot_vpn_ua.pcapng -f 3 -c 192.
 Live timing wireshark graph -> Statistics -> I/O Graphs
 
 ip.src==192.168.19.24 -> detetar pacotes upload
+
+
+Apresentaçao:
+
+Classificaçao: Browsing, youtube, p2p e class
+Anomalias de bots
+
+Apresentação de métricas e features utilizadas(justificaçao):
+percentagem de sucesso/melhores modelos
+
+Falar sobre percentagem de dados utilizada para treino e testes
+
+Falar sobre os algoritmos/modelos de machine learning utilizados
+
+Features cruciais:
+Silencio -> É fundamental obter o desvio padãro do silêncio para classificação de amostras. Silêncio nos pacotes p2p e class é nulo, há sempre trocas de pacotes. No browsing costuma ser longo
+Wavelet -> É fundamental para distinguir p2p de class
+
+Features inúteis:
+Skewness
+Kurtosis
+
+Slides:
+Colocar gráficos de features importantes nos slides
+Brute force para descobrir todas as features necessárias
+Tabela com valores obtidos nos diferentes algoritmos (classificaçao e anomalias)
+Completar slides e preparar apresentação
