@@ -26,26 +26,21 @@ def waitforEnter(fstop=False):
         else:
             input("Press ENTER to continue.")
 
-
 #function to create plots for each class
-def plotClasses(data1,name1,data2,name2,data3,name3,data4,name4,data5,name5):
-    plt.subplot(5,1,1)
+def plotClasses(data1,name1,data2,name2,data3,name3,data4,name4):
+    plt.subplot(4,1,1)
     plt.plot(data1)
     plt.title(name1)
-    plt.subplot(5,1,2)
+    plt.subplot(4,1,2)
     plt.plot(data2)
     plt.title(name2)
-    plt.subplot(5,1,3)
+    plt.subplot(4,1,3)
     plt.plot(data3)
     plt.title(name3)
-    plt.subplot(5,1,4)
+    plt.subplot(4,1,4)
     plt.plot(data4)
     plt.title(name4)
-    plt.subplot(5,1,5)
-    plt.plot(data5)
-    plt.title(name5)
     plt.show()
-
 
 #function to divide samples (dataset) in a training part and a testing part
 def breakTrainTest(data,oWnd=300,trainPerc=0.6):
@@ -63,29 +58,20 @@ def breakTrainTest(data,oWnd=300,trainPerc=0.6):
     
     return(data_train,data_test)
 
-
-#function to extract features from each type of sample, params are data and the type of data
+#function to extract features from each type of sample
 def extractFeatures(data,Class=0):
     features=[]
     nObs,nSamp,nCols=data.shape
     oClass=np.ones((nObs,1))*Class
     for i in range(nObs):
-        M1=np.mean(data[i,:,:],axis=0) #media
-        #Md1=np.median(data[i,:,:],axis=0) #mediana
-        Std1=np.std(data[i,:,:],axis=0) #desvio padrao
-        Var=np.var(data[i,:,:],axis=0) #variancia
-        S1=stats.skew(data[i,:,:]) #skewness
-        #K1=stats.kurtosis(data[i,:,:]) #kurtosis
         p=[95] #percentis
         Pr1=np.percentile(data[i,:,:],p,axis=0)
-        
-        #faux=np.hstack((M1,Md1,Std1,S1,K1,Pr1))
+
         faux=np.hstack(Pr1)
         features.append(faux)
         
     return(np.array(features),oClass)
 
-featuresNames.append("Standard Deviation,")
 featuresNames.append("Percentile 95,")
 
 #same as before but only for periods of silence
@@ -130,7 +116,6 @@ def plotFeatures(features,oClass,f1index=0,f2index=1):
 
     plt.show()
 
-#nao percebo bem -> vai buscar data periodicamente
 def extractFeaturesWavelet(data,scales=[2,4,8,16,32],Class=0):
     features=[]
     nObs,nSamp,nCols=data.shape
@@ -151,13 +136,13 @@ Classes={0:'YouTube',1:'Browsing',2:'P2P', 3:'VideoCall', 4: 'Bot'}
 ## -- extract data from files -- ##
 yt=np.loadtxt('2p1hyoutube.txt')
 browsing=np.loadtxt('2p1hbrowsing.txt')
-p2p=np.loadtxt('2p1hp2p.txt')
+p2p=np.loadtxt('2p1hp2p112kb.txt')
 vc=np.loadtxt('2p1hclass.txt')
 bot=np.loadtxt('2p1hgoodbot.txt')
 
 ## -- show plots of each data type -- ##
 plt.figure(1)
-plotClasses(yt,'YouTube',browsing,'Browsing',p2p,'P2P',vc,'VideoCall',bot,'Bot')
+plotClasses(yt,'YouTube',browsing,'Browsing',p2p,'P2P',vc,'VideoCall')
 
 ## -- save training and test part of each sample and show graphics of training part: 0(b)-download 1(g)-upload -- ##
 yt_train,yt_test=breakTrainTest(yt)
@@ -167,35 +152,29 @@ vc_train,vc_test=breakTrainTest(vc)
 bot_train,bot_test=breakTrainTest(bot)
 
 plt.figure(2)
-plt.subplot(5,1,1)
+plt.subplot(4,1,1)
 for i in range(7):
     plt.plot(yt_train[i,:,0],'b')
     plt.plot(yt_train[i,:,1],'g')
 plt.title('YouTube')
 plt.ylabel('Bytes/sec')
-plt.subplot(5,1,2)
+plt.subplot(4,1,2)
 for i in range(7):
     plt.plot(browsing_train[i,:,0],'b')
     plt.plot(browsing_train[i,:,1],'g')
 plt.title('Browsing')
 plt.ylabel('Bytes/sec')
-plt.subplot(5,1,3)
+plt.subplot(4,1,3)
 for i in range(7):
     plt.plot(vc_train[i,:,0],'b')
     plt.plot(vc_train[i,:,1],'g')
 plt.title('VC')
 plt.ylabel('Bytes/sec')
-plt.subplot(5,1,4)
+plt.subplot(4,1,4)
 for i in range(7):
     plt.plot(p2p_train[i,:,0],'b')
     plt.plot(p2p_train[i,:,1],'g')
 plt.title('P2P')
-plt.ylabel('Bytes/sec')
-plt.subplot(5,1,5)
-for i in range(7):
-    plt.plot(bot_train[i,:,0],'b')
-    plt.plot(bot_train[i,:,1],'g')
-plt.title('Bot')
 plt.ylabel('Bytes/sec')
 plt.show()
 
@@ -251,7 +230,7 @@ i2trainFeatures=np.hstack((trainFeatures,trainFeaturesS,trainFeaturesW))
 #:2 -> training set for traffic classification
 trainFeatures_yt,oClass_yt=extractFeatures(yt_train,Class=0)
 trainFeatures_browsing,oClass_browsing=extractFeatures(browsing_train,Class=1)
-#trainFeatures_bot,oClass_bot=extractFeatures(bot_train,Class=2)
+#trainFeatures_bot,oClass_bot=extractFeatures(bot_train,Class=2) #bot não é utilizado para treinar os modelos, pois o seu comportamento é desconhecido
 trainFeatures_p2p,oClass_p2p=extractFeatures(p2p_train,Class=2)
 trainFeatures_vc,oClass_vc=extractFeatures(vc_train,Class=3)
 trainFeatures=np.vstack((trainFeatures_yt,trainFeatures_browsing,trainFeatures_p2p,trainFeatures_vc))
@@ -311,7 +290,7 @@ i3trainFeaturesN=i3trainScaler.transform(i3trainFeatures)
 i3AtestFeaturesN=i2trainScaler.transform(i3testFeatures)
 i3CtestFeaturesN=i3trainScaler.transform(i3testFeatures)
 
-## -- reduce previous features to only 3 main components (nao percebi bem) -- ##
+## -- reduce previous features to only 3 main components -- ##
 pca = PCA(n_components=3, svd_solver='full')
 
 i2trainPCA=pca.fit(i2trainFeaturesN)
@@ -322,10 +301,6 @@ i3trainFeaturesNPCA = i3trainPCA.transform(i3trainFeaturesN)
 
 i3AtestFeaturesNPCA = i2trainPCA.transform(i3AtestFeaturesN)
 i3CtestFeaturesNPCA = i3trainPCA.transform(i3CtestFeaturesN)
-
-plt.figure(8)
-plotFeatures(i2trainFeaturesNPCA,o2trainClass,0,1)
-#se quisermos ver de outros, alterar os parametros de entrada
 
 #CLASSIFICATION
 ## -- 18 -- #
@@ -351,34 +326,12 @@ failed3=0
 
 nObsTest,nFea=i3CtestFeaturesN.shape
 for i in range(nObsTest-6):
-    if nSamples<6: 
-        if (Classes[L1[i]]) != "YouTube":
-           failed1+=1
-        if (Classes[L2[i]]) != "YouTube":
-           failed2+=1
-        if (Classes[L3[i]]) != "YouTube":
-           failed3+=1
-    elif(nSamples<12):
-        if (Classes[L1[i]]) != "Browsing":
-           failed1+=1
-        if (Classes[L2[i]]) != "Browsing":
-           failed2+=1
-        if (Classes[L3[i]]) != "Browsing":
-           failed3+=1
-    elif(nSamples<18):
-        if (Classes[L1[i]]) != "P2P":
-           failed1+=1
-        if (Classes[L2[i]]) != "P2P":
-           failed2+=1
-        if (Classes[L3[i]]) != "P2P":
-           failed3+=1
-    else:
-        if (Classes[L1[i]]) != "VideoCall":
-           failed1+=1
-        if (Classes[L2[i]]) != "VideoCall":
-           failed2+=1
-        if (Classes[L3[i]]) != "VideoCall":
-           failed3+=1
+    if (Classes[L1[i]]) != Classes[o3testClassClassification[i][0]]:
+        failed1+=1
+    if (Classes[L2[i]]) != Classes[o3testClassClassification[i][0]]:
+        failed2+=1
+    if (Classes[L3[i]]) != Classes[o3testClassClassification[i][0]]:
+        failed3+=1
     nSamples+=1
     #print('Obs: {:2} ({:<8}): Kernel Linear->{:<10} | Kernel RBF->{:<10} | Kernel Poly->{:<10}'.format(i,Classes[o3testClassClassification[i][0]],Classes[L1[i]],Classes[L2[i]],Classes[L3[i]]))
 percentageL=(nSamples-failed1)*100/nSamples
@@ -405,34 +358,12 @@ failed3=0
 
 nObsTest,nFea=i3CtestFeaturesNPCA.shape
 for i in range(nObsTest-6):
-    if nSamples<6: 
-        if (Classes[L1[i]]) != "YouTube":
-           failed1+=1
-        if (Classes[L2[i]]) != "YouTube":
-           failed2+=1
-        if (Classes[L3[i]]) != "YouTube":
-           failed3+=1
-    elif(nSamples<12):
-        if (Classes[L1[i]]) != "Browsing":
-           failed1+=1
-        if (Classes[L2[i]]) != "Browsing":
-           failed2+=1
-        if (Classes[L3[i]]) != "Browsing":
-           failed3+=1
-    elif(nSamples<18):
-        if (Classes[L1[i]]) != "P2P":
-           failed1+=1
-        if (Classes[L2[i]]) != "P2P":
-           failed2+=1
-        if (Classes[L3[i]]) != "P2P":
-           failed3+=1
-    else:
-        if (Classes[L1[i]]) != "VideoCall":
-           failed1+=1
-        if (Classes[L2[i]]) != "VideoCall":
-           failed2+=1
-        if (Classes[L3[i]]) != "VideoCall":
-           failed3+=1
+    if (Classes[L1[i]]) != Classes[o3testClassClassification[i][0]]:
+        failed1+=1
+    if (Classes[L2[i]]) != Classes[o3testClassClassification[i][0]]:
+        failed2+=1
+    if (Classes[L3[i]]) != Classes[o3testClassClassification[i][0]]:
+        failed3+=1
     nSamples+=1
     #print('Obs: {:2} ({:<8}): Kernel Linear->{:<10} | Kernel RBF->{:<10} | Kernel Poly->{:<10}'.format(i,Classes[o3testClassClassification[i][0]],Classes[L1[i]],Classes[L2[i]],Classes[L3[i]]))
 percentageL=(nSamples-failed1)*100/nSamples
@@ -504,4 +435,4 @@ for i in range(nObsTest-6):
     #print('Obs: {:2} ({:<8}): Classification->{}'.format(i,Classes[o3testClassClassification[i][0]],Classes[LT[i]])) 
 
 percentage=(nSamples-failed1)*100/nSamples
-print(f'% acerto: {percentage}')   
+print(f'% acerto: {percentage}')

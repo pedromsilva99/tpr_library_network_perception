@@ -47,8 +47,6 @@ def plotClasses(data1,name1,data2,name2,data3,name3,data4,name4,data5,name5):
     plt.title(name5)
     plt.show()
 
-
-#function to divide samples (dataset) in a training part and a testing part
 def breakTrainTest(data,oWnd=300,trainPerc=0.6):
     nSamp,nCols=data.shape
     nObs=int(nSamp/oWnd)
@@ -65,7 +63,7 @@ def breakTrainTest(data,oWnd=300,trainPerc=0.6):
     return(data_train,data_test)
 
 
-#function to extract features from each type of sample, params are data and the type of data
+#function to extract features from each type of sample
 def extractFeatures(data,Class=0):
     features=[]
     nObs,nSamp,nCols=data.shape
@@ -73,8 +71,6 @@ def extractFeatures(data,Class=0):
     for i in range(nObs):
         M1=np.mean(data[i,:,:],axis=0) #media
         Var=np.var(data[i,:,:],axis=0) #variancia
-        S1=stats.skew(data[i,:,:]) #skewness
-        Std1=np.std(data[i,:,:],axis=0) #desvio padrao
         
         faux=np.hstack((M1,Var))
         features.append(faux)
@@ -83,7 +79,6 @@ def extractFeatures(data,Class=0):
 
 featuresNames.append("Mean,")
 featuresNames.append("Variance,")
-
 
 #same as before but only for periods of silence
 def extratctSilence(data,threshold=256):
@@ -111,13 +106,9 @@ def extractFeaturesSilence(data,Class=0):
                 silence_features=np.append(silence_features,[np.mean(silence),np.var(silence)])
             else:
                 silence_features=np.append(silence_features,[0,0])
-            
-            
         features.append(silence_features)
-        
     return(np.array(features),oClass)
 
-#alterar o ncomponents ate dar bem
 #create plot for features
 def plotFeatures(features,oClass,f1index=0,f2index=1):
     nObs,nFea=features.shape
@@ -127,7 +118,6 @@ def plotFeatures(features,oClass,f1index=0,f2index=1):
 
     plt.show()
 
-#nao percebo bem -> vai buscar data periodicamente
 def extractFeaturesWavelet(data,scales=[2,4,8,16,32],Class=0):
     features=[]
     nObs,nSamp,nCols=data.shape
@@ -148,9 +138,10 @@ Classes={0:'YouTube',1:'Browsing',2:'P2P', 3:'VideoCall', 4: 'Bot'}
 ## -- extract data from files -- ##
 yt=np.loadtxt('2p1hyoutube.txt')
 browsing=np.loadtxt('2p1hbrowsing.txt')
-p2p=np.loadtxt('2p1hp2p.txt')
+p2p=np.loadtxt('2p1hp2p112kb.txt')
 vc=np.loadtxt('2p1hclass.txt')
-bot=np.loadtxt('2p1hgoodbot.txt')
+#change bot here
+bot=np.loadtxt('2p1hsimplebot.txt')
 
 ## -- show plots of each data type -- ##
 plt.figure(1)
@@ -247,7 +238,7 @@ i2trainFeatures=np.hstack((trainFeatures,trainFeaturesS,trainFeaturesW))
 #:2 -> training set for traffic classification
 trainFeatures_yt,oClass_yt=extractFeatures(yt_train,Class=0)
 trainFeatures_browsing,oClass_browsing=extractFeatures(browsing_train,Class=1)
-#trainFeatures_bot,oClass_bot=extractFeatures(bot_train,Class=2)
+#trainFeatures_bot,oClass_bot=extractFeatures(bot_train,Class=2) #bot não é utilizado para treinar os modelos, pois o seu comportamento é desconhecido
 trainFeatures_p2p,oClass_p2p=extractFeatures(p2p_train,Class=2)
 trainFeatures_vc,oClass_vc=extractFeatures(vc_train,Class=3)
 trainFeatures=np.vstack((trainFeatures_yt,trainFeatures_browsing,trainFeatures_p2p,trainFeatures_vc))
@@ -319,11 +310,6 @@ i3trainFeaturesNPCA = i3trainPCA.transform(i3trainFeaturesN)
 i3AtestFeaturesNPCA = i2trainPCA.transform(i3AtestFeaturesN)
 i3CtestFeaturesNPCA = i3trainPCA.transform(i3CtestFeaturesN)
 
-plt.figure(8)
-plotFeatures(i2trainFeaturesNPCA,o2trainClass,0,1)
-#se quisermos ver de outros, alterar os parametros de entrada
-
-
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #ANOMALY DETECTION
@@ -392,8 +378,6 @@ failed1=0
 failed2=0
 failed3=0
 for i in range(nObsTest):
-    
-    
     if nSamples<24: 
         if (AnomResults[L1[i]]) == "Anomaly":
            failed1+=1
